@@ -14,17 +14,19 @@ import torch.nn.init as init
 
 def get_mean_and_std(dataset):
     '''Compute the mean and std value of dataset.'''
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=2)
+    dataloader = torch.utils.data.DataLoader(
+        dataset, batch_size=1, shuffle=True, num_workers=2)
     mean = torch.zeros(3)
     std = torch.zeros(3)
     print('==> Computing mean and std..')
     for inputs, targets in dataloader:
         for i in range(3):
-            mean[i] += inputs[:,i,:,:].mean()
-            std[i] += inputs[:,i,:,:].std()
+            mean[i] += inputs[:, i, :, :].mean()
+            std[i] += inputs[:, i, :, :].std()
     mean.div_(len(dataset))
     std.div_(len(dataset))
     return mean, std
+
 
 def init_params(net):
     '''Init layer parameters.'''
@@ -49,6 +51,8 @@ term_width = 80
 TOTAL_BAR_LENGTH = 30.
 last_time = time.time()
 begin_time = last_time
+
+
 def progress_bar(current, total, msg=None):
     global last_time, begin_time
     if current == 0:
@@ -92,6 +96,7 @@ def progress_bar(current, total, msg=None):
         sys.stdout.write('\n')
     sys.stdout.flush()
 
+
 def format_time(seconds):
     days = int(seconds / 3600/24)
     seconds = seconds - days*3600*24
@@ -123,3 +128,23 @@ def format_time(seconds):
     if f == '':
         f = '0ms'
     return f
+
+
+def DCT(image):
+    return dct(dct(image, norm="ortho", axis=0), norm="ortho", axis=1)
+
+
+def iDCT(image):
+    return idct(idct(image, norm="ortho", axis=0), norm="ortho", axis=1)
+
+####################################
+# imshow func
+####################################
+def imshow(img):
+	img = img / 2 + 0.5     # unnormalize
+	npimg = img.numpy()
+	plt.imshow(np.transpose(npimg, (1, 2, 0)))
+
+def _imshow(img):
+	imshow(torchvision.utils.make_grid(img))
+
